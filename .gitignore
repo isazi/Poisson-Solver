@@ -1,0 +1,25 @@
+# added by melt
+build/*
+notebooks/*
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+*.out
+
+# binary files
+*.pdf
