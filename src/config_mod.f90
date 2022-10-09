@@ -8,12 +8,15 @@ module config
   public :: x_0, y_0, dx, dy
   public :: alpha
   public :: max_iter
+  public :: debug
 
   integer, parameter :: nr = 6, nc = 6
   integer, parameter :: max_iter = 100
   real(kind=wp), parameter :: x_0 = 1._wp, dx=1._wp
   real(kind=wp), parameter :: y_0 = 1._wp, dy=1._wp
-  real(kind=wp), parameter :: alpha = 6.0_wp
+  real(kind=wp), parameter :: alpha = 1.0_wp
+
+  logical, parameter :: debug = .false.
 
 end module config
 
