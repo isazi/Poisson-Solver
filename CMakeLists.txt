@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(GaussSeidel)
+project(Solver)
 
 enable_language(Fortran)
 
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fopenmp -fcheck=all -Wall -std=f2008")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -fopenmp -fcheck=all -Wall -std=f2008")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -qopenmp -warn all")
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
@@ -24,12 +28,14 @@ set(main_sources
     "src/color_mod.f90"
     "src/config_mod.f90"
     "src/grid_mod.f90"
+    "src/gauss_seidel_mod.f90"
+    "src/lapack_mod.f90"
     "src/precisn_mod.f90"
-    "src/gs-solve.F90"
+    "src/poisson_solver.F90"
 )
 
-add_executable(gs-solve ${main_sources})
-target_link_libraries(gs-solve ${LAPACK_LIBRARIES})
+add_executable(solver ${main_sources})
+target_link_libraries(solver ${LAPACK_LIBRARIES})
 
 #add_library(precision STATIC "src/precisn_mod.f90")
 #target_link_libraries(main precision)

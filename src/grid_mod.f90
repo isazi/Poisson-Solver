@@ -5,7 +5,7 @@ module grid
   implicit none
 
   private
-  public :: init_grid, get_xy_pos
+  public :: init_grid, get_xy_pos, func
 
 contains
   subroutine get_xy_pos(r, c, x, y)
@@ -30,5 +30,15 @@ contains
     u_grid(:, nc) = alpha
 
   end subroutine init_grid
+
+  function func(x, y) result(f)
+    implicit none
+    real(kind=wp), intent(in) :: x, y
+    real(kind=wp) :: f
+
+    ! currently f is constant with no dependence on x and y
+    f = 0._wp*(x*y) + 2._wp
+
+  end function func
 
 end module grid
