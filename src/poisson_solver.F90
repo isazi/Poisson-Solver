@@ -48,6 +48,6 @@ program poisson_solver
   print '(a, f10.4)', ' time (s) = ', t2 - t1
   print *, 'finished'
   write(10, u_wrt) u_grid
-  write(*, u_wrt) u_grid
+  ! write(*, u_wrt) u_grid
 
 end program poisson_solver

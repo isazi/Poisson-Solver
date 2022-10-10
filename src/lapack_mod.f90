@@ -81,7 +81,7 @@ contains
 
     allocate(ipiv(N))
 
-    print '(a, i0)', 'LAPACK N = ', N
+    print '(a, i0)', ' solving A(N, N) x(N) = b(N) for N = ', N
     call dgesv(N, 1, A, N, ipiv, b, N, info)
     if (info /= 0) then
       print '(a, i0)', 'info = ', info
