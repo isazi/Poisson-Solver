@@ -63,7 +63,7 @@ contains
       !$omp end parallel do
 
       max_diff = maxval(abs(u_grid - u_grid_old))
-      if (max_diff < 1e-8) exit
+      if (max_diff < 1e-11) exit
 
     end do
 

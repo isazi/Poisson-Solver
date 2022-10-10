@@ -11,7 +11,7 @@ module config
   public :: debug
 
   integer, parameter :: nr = 200, nc = nr
-  integer, parameter :: max_iter = 80000
+  integer, parameter :: max_iter = 200000
   real(kind=wp), parameter :: x_0 = 1._wp, dx=0.1_wp
   real(kind=wp), parameter :: y_0 = x_0, dy=dx
   real(kind=wp), parameter :: alpha = 1.0_wp
