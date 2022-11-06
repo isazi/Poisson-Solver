@@ -9,13 +9,13 @@ module grid
 
 contains
   subroutine get_xy_pos(r, c, x, y)
+    !$acc routine seq
     implicit none
     integer, intent(in) :: r, c
     real(kind=wp), intent(out)  :: x, y
 
     x = x_0 + (c - 1) * dx
     y = y_0 + (r - 1) * dy
-
   end subroutine get_xy_pos
 
   subroutine init_grid(u_grid)
@@ -32,6 +32,7 @@ contains
   end subroutine init_grid
 
   function func(x, y) result(f)
+    !$acc routine seq
     implicit none
     real(kind=wp), intent(in) :: x, y
     real(kind=wp) :: f

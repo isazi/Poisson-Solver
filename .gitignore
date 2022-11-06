@@ -1,5 +1,5 @@
 # added by melt
-build/*
+build*/*
 notebooks/*
 
 # vim releated

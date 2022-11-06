@@ -44,23 +44,23 @@ contains
 
       u_grid_old = u_grid
 
-      !$omp parallel do private(i, r, c, u_next)
+      !$acc parallel loop
       do i = 1, red%num
         r = red%rows(i)
         c = red%cols(i)
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end parallel do
+      !$acc end parallel loop
 
-      !$omp parallel do private(i, r, c, u_next)
+      !$acc parallel loop
       do i = 1, blu%num
         r = blu%rows(i)
         c = blu%cols(i)
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end parallel do
+      !$acc end parallel loop
 
       max_diff = maxval(abs(u_grid - u_grid_old))
       if (max_diff < 1e-11) exit
