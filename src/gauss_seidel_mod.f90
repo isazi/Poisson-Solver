@@ -35,16 +35,36 @@ contains
     type(color_group) :: red, blu
     real(kind=wp)     :: u_grid_old(nr, nc), u_next
     integer           :: r, c
-    integer           :: i
+    integer           :: i, j
 
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
-    do n_iter = 1, max_iter
+    ! NOTES
+    ! report 2 - parallel loop dirs only
+    ! report 4 - data copy for u_grid and u_next
+    ! report 6 - data copyin for red and blu
 
-      u_grid_old = u_grid
+    !$acc data copyin(red, red%rows, red%cols, &
+    !$acc             blu, blu%rows, blu%cols, &
+    !$acc             u_grid) &
+    !$acc      create(u_next, u_grid_old)
 
-      !$acc parallel loop
+    max_diff = 1._wp
+    n_iter = 0
+
+    do while ((n_iter <= max_iter) .and. (max_diff > 1.0e-11))
+      max_diff = 0._wp
+
+      !$acc parallel loop gang collapse(2)
+      do j = 1, nc
+        do i = 1, nr
+          u_grid_old(i, j) = u_grid(i, j)
+        end do
+      end do
+      !$acc end parallel loop
+
+      !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red%rows(i)
         c = red%cols(i)
@@ -53,7 +73,7 @@ contains
       end do
       !$acc end parallel loop
 
-      !$acc parallel loop
+      !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu%rows(i)
         c = blu%cols(i)
@@ -62,10 +82,23 @@ contains
       end do
       !$acc end parallel loop
 
-      max_diff = maxval(abs(u_grid - u_grid_old))
-      if (max_diff < 1e-11) exit
+      !$acc parallel loop collapse(2) reduction(max:max_diff)
+      do j = 1, nc
+        do i = 1, nr
+          max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
+        end do
+      end do
+      !$acc end parallel loop
+
+      ! if(mod(n_iter, 2000) == 0) then
+      !   print *, 'iter = ', n_iter, ' max_diff = ', max_diff
+      ! end if
+
+      n_iter = n_iter + 1
 
     end do
+    !$acc update self(u_grid)
+    !$acc end data
 
   end subroutine solve
 
