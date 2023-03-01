@@ -1,5 +1,7 @@
 # Poisson Solver
 
+![build status](https://github.com/TomMelt/openMP-Poisson/actions/workflows/cmake.yaml/badge.svg)
+
 This project solve Poisson's equation on a 2D grid using either:
 1. A parallel openMP implementation of the Gauss-Seidel method
 2. or LAPACK
