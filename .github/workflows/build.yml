@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure CMake Gauss-Seidel
+      run: >
+        cmake -B ${{github.workspace}}/build-gs
+        -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_CXX_COMPILER=g++
+        -D USEGS=ON
+
+    - name: Configure CMake LAPACK
+      run: >
+        cmake -B ${{github.workspace}}/build-lp
+        -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_CXX_COMPILER=g++
+        -D USEGS=OFF
+
+    - name: Compile Gauss-Seidel
+      run: cmake --build ${{github.workspace}}/build-gs --config ${{env.BUILD_TYPE}}
+
+    - name: Compile LAPACK
+      run: cmake --build ${{github.workspace}}/build-lp --config ${{env.BUILD_TYPE}}
