@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Configure CMake Gauss-Seidel
-      run: |
+      run: >
         cmake -B ${{github.workspace}}/build-gs
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -D CMAKE_C_COMPILER=gcc
@@ -23,7 +23,7 @@ jobs:
         -D USEGS=ON
 
     - name: Configure CMake LAPACK
-      run: |
+      run: >
         cmake -B ${{github.workspace}}/build-lp
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -D CMAKE_C_COMPILER=gcc
