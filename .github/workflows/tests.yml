@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install numdiff
+      run: sudo apt install -y numdiff
+
     - name: Configure CMake Gauss-Seidel
       run: >
         cmake -B ${{github.workspace}}/build-gs
@@ -40,8 +43,8 @@ jobs:
 
     - name: Test Gauss-Seidel
       working-directory: ${{github.workspace}}/build-gs
-      run: ./bin/solver 50 100000
+      run: ctest -V
 
     - name: Test LAPACK
       working-directory: ${{github.workspace}}/build-lp
-      run: ./bin/solver 50 100000
+      run: ctest -V
