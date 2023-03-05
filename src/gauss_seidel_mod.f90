@@ -44,20 +44,33 @@ contains
     real(kind=wp), intent(out)   :: max_diff       ! max difference between matrix elements
     integer, intent(out)         :: n_iter         ! final number of iterations
 
-    ! local vars
     type(color_group) :: red, blu
     real(kind=wp)     :: u_grid_old(nr, nc), u_next
     integer           :: r, c
-    integer           :: i
+    integer           :: i, j
 
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
+    !$acc data copyin(red, red%rows, red%cols, &
+    !$acc             blu, blu%rows, blu%cols, &
+    !$acc             u_grid) &
+    !$acc      create(u_next, u_grid_old)
+
     do n_iter = 1, max_iter
 
-      u_grid_old = u_grid
+      !$omp parallel do private(j) collapse(2)
+      !$acc parallel loop gang collapse(2)
+      do j = 1, nc
+        do i = 1, nr
+          u_grid_old(i, j) = u_grid(i, j)
+        end do
+      end do
+      !$omp end parallel do
+      !$acc end parallel loop
 
       !$omp parallel do private(i, r, c, u_next)
+      !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red%rows(i)
         c = red%cols(i)
@@ -65,8 +78,10 @@ contains
         u_grid(r, c) = u_next
       end do
       !$omp end parallel do
+      !$acc end parallel loop
 
       !$omp parallel do private(i, r, c, u_next)
+      !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu%rows(i)
         c = blu%cols(i)
@@ -74,11 +89,24 @@ contains
         u_grid(r, c) = u_next
       end do
       !$omp end parallel do
+      !$acc end parallel loop
 
-      max_diff = maxval(abs(u_grid - u_grid_old))
+      max_diff = 0._wp
+      !$omp parallel do private(j) collapse(2) reduction(max:max_diff)
+      !$acc parallel loop collapse(2) reduction(max:max_diff)
+      do j = 1, nc
+        do i = 1, nr
+          max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
+        end do
+      end do
+      !$omp end parallel do
+      !$acc end parallel loop
+
       if (max_diff < 1e-11) exit
 
     end do
+    !$acc update self(u_grid)
+    !$acc end data
 
   end subroutine solve
 

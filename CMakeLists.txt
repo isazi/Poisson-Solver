@@ -10,6 +10,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -fopenmp -fcheck=all -Wall -std=f2008")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -qopenmp -warn all")
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+#     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -acc -Wall")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

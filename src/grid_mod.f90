@@ -9,6 +9,7 @@ module grid
 
 contains
   subroutine get_xy_pos(r, c, x, y)
+    !$acc routine seq
     ! Get the x and y position in real-space for a given row and column (r, c)
     ! inputs:
     ! - r : int : row index
@@ -44,6 +45,7 @@ contains
   end subroutine init_grid
 
   function func(x, y) result(f)
+    !$acc routine seq
     ! This function is the RHS of Laplacian D_xy U(x,y) = f(x,y)
     ! inputs:
     ! - x : real(kind=wp) : x position in real-space
