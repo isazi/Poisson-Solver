@@ -1,5 +1,8 @@
 # Poisson Solver
 
+[![build](https://github.com/TomMelt/openMP-Poisson/actions/workflows/build.yml/badge.svg)](https://github.com/TomMelt/openMP-Poisson/actions/workflows/build.yml)
+[![tests](https://github.com/TomMelt/openMP-Poisson/actions/workflows/tests.yml/badge.svg)](https://github.com/TomMelt/openMP-Poisson/actions/workflows/tests.yml)
+
 This project solve Poisson's equation on a 2D grid using either:
 1. A parallel openMP implementation of the Gauss-Seidel method
 2. or LAPACK
@@ -36,3 +39,30 @@ Procs | LAPACK | Gauss-Seidel
 LAPACK | Gauss-Seidel
 ------ | ------------
 11.6Gb | 22Mb
+
+**TESTS**
+
+The test was run on arm CPU `Neoverse-N1` with 512 Gb RAM.
+
+Problem size `u_grid` dims = [300,300]
+number of iterations =       192018
+
+Cores | Time (s)
+------|---------
+   80 |  36.0912
+   64 |  31.6890
+   32 |  35.1820
+   16 |  43.3966
+   8  |  60.4974
+   4  |  94.1945
+   2  | 159.6329
+   1  | 218.5429
+
+The test was run on nvidia GPU `NVIDIA A100` with 40 Gb RAM connected to the arm system above.
+
+Problem size `u_grid` dims = [300,300]
+number of iterations =       192018
+
+GPU   | Time (s)
+------|---------
+ na   |  18.1043

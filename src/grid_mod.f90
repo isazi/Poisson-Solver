@@ -10,17 +10,30 @@ module grid
 contains
   subroutine get_xy_pos(r, c, x, y)
     !$acc routine seq
+    ! Get the x and y position in real-space for a given row and column (r, c)
+    ! inputs:
+    ! - r : int : row index
+    ! - c : int : column index
+    ! outputs:
+    ! - x : int : x position
+    ! - y : int : y position
     implicit none
     integer, intent(in) :: r, c
     real(kind=wp), intent(out)  :: x, y
 
     x = x_0 + (c - 1) * dx
     y = y_0 + (r - 1) * dy
+
   end subroutine get_xy_pos
 
   subroutine init_grid(u_grid)
+    ! u_grid (the solution) is initially unknown and we want to find it iteratively using the Gauss-seidel method or directly using
+    ! LAPACK solvers
+    ! This routine sets the boundary condition and initializes the interior elements to zero.
+    ! outputs:
+    ! - u_grid : real(kind=wp)(:,:) : solution grid
     implicit none
-    real(kind=wp), intent(inout)  :: u_grid(:,:)
+    real(kind=wp), intent(out)  :: u_grid(:,:)
 
     u_grid = 0._wp
 
@@ -33,6 +46,12 @@ contains
 
   function func(x, y) result(f)
     !$acc routine seq
+    ! This function is the RHS of Laplacian D_xy U(x,y) = f(x,y)
+    ! inputs:
+    ! - x : real(kind=wp) : x position in real-space
+    ! - y : real(kind=wp) : y position in real-space
+    ! returns:
+    ! - f : real(kind=wp) : value of function func at position (x,y)
     implicit none
     real(kind=wp), intent(in) :: x, y
     real(kind=wp) :: f

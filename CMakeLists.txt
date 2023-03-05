@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 project(Solver)
 
 enable_language(Fortran)
+enable_testing()
+add_subdirectory(tests)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3 -fopenmp -fcheck=all -Wall -std=f2008")

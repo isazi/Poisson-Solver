@@ -2,7 +2,7 @@ module gauss_seidel
 
   use omp_lib
   use precisn, only: wp
-  use config, only: nr, nc, max_iter, debug, dx
+  use config, only: nr, nc, max_iter, debug, dx, dy
   use color, only: color_group, init_color_groups
   use grid, only: init_grid, get_xy_pos, func
 
@@ -11,6 +11,13 @@ module gauss_seidel
 contains
 
   subroutine gs_method(r, c, u_grid, u)
+    ! Gauss-Seidel method to solve for u at given row and column (r, c)
+    ! inputs:
+    ! - r      : int                : row index
+    ! - c      : int                : column index
+    ! - u_grid : real(kind=wp)(:,:) : current u_grid
+    ! outputs:
+    ! - u      : real(kind=wp)      : solution at location (r, c)
     implicit none
     integer, intent(in)        :: r, c
     real(kind=wp), intent(in)  :: u_grid(:,:)
@@ -21,13 +28,19 @@ contains
 
     call get_xy_pos(r, c, x, y)
     b = func(x, y)
-    u = -(1._wp/4._wp) * (b * dx * dx - u_grid(r-1, c) - u_grid(r+1, c) - u_grid(r, c-1) - u_grid(r, c+1))
+    u = -(1._wp/4._wp) * (b * dx * dy - u_grid(r-1, c) - u_grid(r+1, c) - u_grid(r, c-1) - u_grid(r, c+1))
 
   end subroutine gs_method
 
   subroutine solve(u_grid, max_diff, n_iter)
+    ! Parallelized solver calling iterative gs_method for each grid point. This method will converge when max_diff satisfies the
+    ! exit criteria or when the number of iterations exceeds max_iter.
+    ! outputs:
+    ! - u_grid   : real(kind=wp)(:,:) : converged u_grid
+    ! - max_diff : real(kind=wp)      : maximum difference in u_grid from previous iteration
+    ! - n_iter   : int                : number of iterations performed
 
-    real(kind=wp), intent(inout) :: u_grid(nr, nc)
+    real(kind=wp), intent(out) :: u_grid(nr, nc)
     real(kind=wp), intent(out)   :: max_diff       ! max difference between matrix elements
     integer, intent(out)         :: n_iter         ! final number of iterations
 

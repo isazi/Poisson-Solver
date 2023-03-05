@@ -1,8 +1,11 @@
 program poisson_solver
+  ! Main program control for poisson solver. This code can be built to use either the Gauss-Seidel Method or LAPACK solvers
+  ! Use macro USEGS=ON to select Gauss-Seidel and USEGS=OFF to select LAPACK
+  ! The solution grid (u_grid) is written to fort.10
 
   use omp_lib
   use precisn, only: wp
-  use config, only: nr, nc, max_iter, debug, dx
+  use config, only: nr, nc, max_iter, debug
   use color, only: color_group, init_color_groups
   use grid, only: init_grid, get_xy_pos, func
 #ifdef USEGS
@@ -69,6 +72,8 @@ program poisson_solver
   print '(a, f10.4)', ' time (s) = ', t2 - t1
   print *, 'finished'
   write(10, u_wrt) u_grid
-  ! write(*, u_wrt) u_grid
+  if (debug) then
+    write(*, u_wrt) u_grid
+  end if
 
 end program poisson_solver

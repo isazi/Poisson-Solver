@@ -4,11 +4,12 @@ module config
   implicit none
 
   private
-  public :: nr, nc
-  public :: x_0, y_0, dx, dy
-  public :: alpha
-  public :: max_iter
-  public :: debug
+  public :: nr, nc   ! number of rows and columns in 2D grid
+  public :: dx, dy   ! spacing between columns and rows respectively
+  public :: x_0, y_0 ! spatial grid runs from x_0 to x_N where x_N = x_0 + nc * dx
+  public :: alpha    ! boundary value
+  public :: max_iter ! max number of iterations for Gauss-Seidel routine
+  public :: debug    ! print debug info if set to .true.
 
   integer :: nr, nc
   integer :: max_iter
