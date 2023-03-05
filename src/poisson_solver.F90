@@ -15,7 +15,6 @@ program poisson_solver
 #endif
 
   implicit none
-
   real(kind=wp), allocatable :: u_grid(:, :)
   real(kind=wp) :: t1, t2
   character(len=20) :: u_fmt, a_fmt, u_wrt
@@ -47,6 +46,7 @@ program poisson_solver
 
   allocate(u_grid(nr, nc))
 
+  ! create output formats
   write(u_fmt, '(a, i0, a)') '(', nc, 'f6.2)'
   write(u_wrt, '(a, i0, a)') '(', nc, 'e14.6)'
   write(a_fmt, '(a, i0, a)') '(', (nc-2)*(nr-2), 'f6.2)'
