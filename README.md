@@ -1,13 +1,13 @@
 # Poisson Solver
 
-[![build](https://github.com/TomMelt/openMP-Poisson/actions/workflows/build.yml/badge.svg)](https://github.com/TomMelt/openMP-Poisson/actions/workflows/build.yml)
-[![tests](https://github.com/TomMelt/openMP-Poisson/actions/workflows/tests.yml/badge.svg)](https://github.com/TomMelt/openMP-Poisson/actions/workflows/tests.yml)
+[![build](https://github.com/TomMelt/Poisson-Solver/actions/workflows/build.yml/badge.svg)](https://github.com/TomMelt/Poisson-Solver/actions/workflows/build.yml)
+[![tests](https://github.com/TomMelt/Poisson-Solver/actions/workflows/tests.yml/badge.svg)](https://github.com/TomMelt/Poisson-Solver/actions/workflows/tests.yml)
 
 This project solve Poisson's equation on a 2D grid using either:
-1. A parallel openMP implementation of the Gauss-Seidel method
+1. A parallel openMP/openACC implementation of the Gauss-Seidel method
 2. or LAPACK
 
-The goal was to practice openMP and parallelization. This was a learning exercise and is not intended to serve as a comparison
+The goal was to practice openMP and openACC parallelization. This was a learning exercise and is not intended to serve as a comparison
 between LAPACK and GS method.
 
 There is a build script `scripts/build.sh`.
