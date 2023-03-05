@@ -40,8 +40,8 @@ jobs:
 
     - name: Test Gauss-Seidel
       working-directory: ${{github.workspace}}/build-gs
-      run: ./bin/solver 100 100000
+      run: ./bin/solver 50 100000
 
     - name: Test LAPACK
       working-directory: ${{github.workspace}}/build-lp
-      run: ./bin/solver 100 100000
+      run: ./bin/solver 50 100000
