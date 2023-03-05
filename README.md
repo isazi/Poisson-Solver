@@ -17,6 +17,10 @@ same answer.
 
 ## Results
 
+### openMP (CPU only)
+
+#### Intel CPU - ifort compiler
+
 For problem size:
 * `ugrid[200,200]`
 * `tol = 1e-11` (GS only)
@@ -40,7 +44,7 @@ LAPACK | Gauss-Seidel
 ------ | ------------
 11.6Gb | 22Mb
 
-**TESTS**
+#### Arm CPU - Gnu compiler
 
 The test was run on arm CPU `Neoverse-N1` with 512 Gb RAM.
 
@@ -49,14 +53,16 @@ number of iterations =       192018
 
 Cores | Time (s)
 ------|---------
-   80 |  36.0912
-   64 |  31.6890
-   32 |  35.1820
-   16 |  43.3966
-   8  |  60.4974
-   4  |  94.1945
-   2  | 159.6329
-   1  | 218.5429
+   80 |  15.4646
+   64 |  14.1203
+   32 |  15.4587
+   16 |  21.6295
+   8  |  38.4833
+   4  |  70.8669
+   2  | 136.7466
+   1  | 270.7637
+
+### openACC (GPU)
 
 The test was run on nvidia GPU `NVIDIA A100` with 40 Gb RAM connected to the arm system above.
 
@@ -65,4 +71,9 @@ number of iterations =       192018
 
 GPU   | Time (s)
 ------|---------
- na   |  18.1043
+ na   |  17.7678
+
+
+## TODO
+
+Continue to profile openACC version. Check for unneccessary memory transfers.
