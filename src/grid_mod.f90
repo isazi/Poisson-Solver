@@ -20,6 +20,7 @@ contains
     implicit none
     integer, intent(in) :: r, c
     real(kind=wp), intent(out)  :: x, y
+    !$omp declare target
 
     x = x_0 + (c - 1) * dx
     y = y_0 + (r - 1) * dy
@@ -55,6 +56,7 @@ contains
     implicit none
     real(kind=wp), intent(in) :: x, y
     real(kind=wp) :: f
+    !$omp declare target
 
     ! currently f is constant with no dependence on x and y
     f = 0._wp*(x*y) + 2._wp

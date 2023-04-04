@@ -25,6 +25,7 @@ contains
 
     real(kind=wp) :: x, y
     real(kind=wp) :: b
+    !$omp declare target
 
     call get_xy_pos(r, c, x, y)
     b = func(x, y)
@@ -48,58 +49,67 @@ contains
     real(kind=wp)     :: u_grid_old(nr, nc), u_next
     integer           :: r, c
     integer           :: i, j
+    integer, allocatable :: red_rows(:), red_cols(:)
+    integer, allocatable :: blu_rows(:), blu_cols(:)
+
 
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
-    !$acc data copyin(red, red%rows, red%cols, &
-    !$acc             blu, blu%rows, blu%cols, &
-    !$acc             u_grid) &
-    !$acc      create(u_next, u_grid_old)
+    allocate(red_rows(red%num), red_cols(red%num))
+    allocate(blu_rows(blu%num), blu_cols(blu%num))
+
+    red_rows = red%rows
+    red_cols = red%cols
+    blu_rows = blu%rows
+    blu_cols = blu%cols
+
+    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid)
+    !$omp target data map(from:u_next, u_grid_old)
 
     do n_iter = 1, max_iter
 
-      !$omp parallel do private(j) collapse(2)
+      !$omp target teams distribute parallel do simd collapse(2)
       !$acc parallel loop gang collapse(2)
       do j = 1, nc
         do i = 1, nr
           u_grid_old(i, j) = u_grid(i, j)
         end do
       end do
-      !$omp end parallel do
+      !$omp end target teams distribute parallel do simd
       !$acc end parallel loop
 
-      !$omp parallel do private(i, r, c, u_next)
+      !$omp target teams distribute parallel do simd private(r, c, u_next)
       !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
-        r = red%rows(i)
-        c = red%cols(i)
+        r = red_rows(i)
+        c = red_cols(i)
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end parallel do
+      !$omp end target teams distribute parallel do simd
       !$acc end parallel loop
 
-      !$omp parallel do private(i, r, c, u_next)
+      !$omp target teams distribute parallel do simd private(r, c, u_next)
       !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
-        r = blu%rows(i)
-        c = blu%cols(i)
+        r = blu_rows(i)
+        c = blu_cols(i)
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end parallel do
+      !$omp end target teams distribute parallel do simd
       !$acc end parallel loop
 
       max_diff = 0._wp
-      !$omp parallel do private(j) collapse(2) reduction(max:max_diff)
+      !$omp target teams distribute parallel do simd collapse(2) reduction(max:max_diff)
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
           max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
         end do
       end do
-      !$omp end parallel do
+      !$omp end target teams distribute parallel do simd
       !$acc end parallel loop
 
       if (max_diff < 1e-11) exit
@@ -107,6 +117,8 @@ contains
     end do
     !$acc update self(u_grid)
     !$acc end data
+    !$omp end target data
+    !$omp end target data
 
   end subroutine solve
 
