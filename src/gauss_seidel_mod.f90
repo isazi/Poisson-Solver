@@ -52,7 +52,6 @@ contains
     integer, allocatable :: red_rows(:), red_cols(:)
     integer, allocatable :: blu_rows(:), blu_cols(:)
 
-
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
@@ -64,8 +63,14 @@ contains
     blu_rows = blu%rows
     blu_cols = blu%cols
 
-    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid)
-    !$omp target data map(from:u_next, u_grid_old)
+    ! openMP 4.5 doesn't appear to support copying derived types
+    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid) &
+    !$omp             map(from:u_next, u_grid_old)
+
+    ! I have changed the openacc version to use the plain arrays instead of
+    ! derived types to make the two version more similar
+    !$acc data copyin(red_rows, red_cols, blu_rows, blu_cols, u_grid) &
+    !$acc      create(u_next, u_grid_old)
 
     do n_iter = 1, max_iter
 
@@ -118,7 +123,7 @@ contains
     !$acc update self(u_grid)
     !$acc end data
     !$omp end target data
-    !$omp end target data
+    !$omp target update to(u_grid)
 
   end subroutine solve
 
