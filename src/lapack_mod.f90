@@ -1,3 +1,9 @@
+! Distributed under MIT License
+!
+! Copyright (c) 2022 Tom Meltzer
+!
+! Please see LICENSE file for more information
+
 module lapack
 
   ! This module uses LAPACK routine dgesv to solve A(N, N) x(N) = b(N)
