@@ -64,13 +64,13 @@ contains
     blu_cols = blu%cols
 
     ! openMP 4.5 doesn't appear to support copying derived types
-    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid) &
-    !$omp             map(from:u_next, u_grid_old)
+    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid_old) &
+    !$omp             map(tofrom:u_grid)
 
     ! I have changed the openacc version to use the plain arrays instead of
     ! derived types to make the two version more similar
     !$acc data copyin(red_rows, red_cols, blu_rows, blu_cols, u_grid) &
-    !$acc      create(u_next, u_grid_old)
+    !$acc      create(u_grid_old)
 
     do n_iter = 1, max_iter
 
@@ -123,7 +123,6 @@ contains
     !$acc update self(u_grid)
     !$acc end data
     !$omp end target data
-    !$omp target update to(u_grid)
 
   end subroutine solve
 
