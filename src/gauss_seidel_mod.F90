@@ -57,6 +57,13 @@ contains
     integer           :: i, j
     integer, allocatable :: red_rows(:), red_cols(:)
     integer, allocatable :: blu_rows(:), blu_cols(:)
+    logical :: is_GPU
+
+    is_GPU = .false.
+#ifdef USEGPU
+    is_GPU = .true.
+#endif
+
 
     call init_grid(u_grid)
     call init_color_groups(red, blu)
@@ -69,8 +76,14 @@ contains
     blu_rows = blu%rows
     blu_cols = blu%cols
 
+    if (is_GPU) then
+      print *, 'Running on GPU...'
+    else
+      print *, 'Running on CPU...'
+    end if
+
     ! openMP 4.5 doesn't appear to support copying derived types
-    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid_old) &
+    !$omp target data if(is_GPU) map(to:red_rows, red_cols, blu_rows, blu_cols, u_grid_old) &
     !$omp             map(tofrom:u_grid)
 
     ! I have changed the openacc version to use the plain arrays instead of
@@ -80,17 +93,19 @@ contains
 
     do n_iter = 1, max_iter
 
-      !$omp target teams distribute parallel do simd collapse(2)
+      !$omp target teams if(is_GPU)
+      !$omp distribute parallel do simd collapse(2)
       !$acc parallel loop gang collapse(2)
       do j = 1, nc
         do i = 1, nr
           u_grid_old(i, j) = u_grid(i, j)
         end do
       end do
-      !$omp end target teams distribute parallel do simd
+      !$omp end target teams
       !$acc end parallel loop
 
-      !$omp target teams distribute parallel do simd private(r, c, u_next)
+      !$omp target teams if(is_GPU)
+      !$omp distribute parallel do simd private(r, c, u_next)
       !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red_rows(i)
@@ -98,10 +113,11 @@ contains
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end target teams distribute parallel do simd
+      !$omp end target teams
       !$acc end parallel loop
 
-      !$omp target teams distribute parallel do simd private(r, c, u_next)
+      !$omp target teams if(is_GPU)
+      !$omp distribute parallel do simd private(r, c, u_next)
       !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu_rows(i)
@@ -109,18 +125,21 @@ contains
         call gs_method(r, c, u_grid, u_next)
         u_grid(r, c) = u_next
       end do
-      !$omp end target teams distribute parallel do simd
+      !$omp end target teams
       !$acc end parallel loop
 
       max_diff = 0._wp
-      !$omp target teams distribute parallel do simd collapse(2) reduction(max:max_diff)
+      !$omp target teams if(is_GPU)
+      !$omp distribute parallel do simd collapse(2) reduction(max:max_diff)
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
           max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
+          write (*,'(A,I0,A,2(I4),3(F8.4))') 'thread = ', omp_get_thread_num(), ' i,j=', &
+            i, j, u_grid_old(i, j), u_grid(i, j), max_diff
         end do
       end do
-      !$omp end target teams distribute parallel do simd
+      !$omp end target teams
       !$acc end parallel loop
 
       if (max_diff < 1e-11) exit

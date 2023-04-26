@@ -23,6 +23,10 @@ endif()
 option(USEACC "Use openACC" OFF)
 option(USEGPU "Use GPU offloading" OFF)
 
+if (USEGPU)
+    add_definitions(-DUSEGPU)
+endif()
+
 if (USEGPU AND NOT CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
     message(FATAL_ERROR "GPU offloading not supported for gnu compiler. Please use nvidia compiler.")
 endif()
@@ -66,7 +70,7 @@ set(main_sources
     "src/color_mod.f90"
     "src/config_mod.f90"
     "src/grid_mod.f90"
-    "src/gauss_seidel_mod.f90"
+    "src/gauss_seidel_mod.F90"
     "src/lapack_mod.f90"
     "src/precisn_mod.f90"
     "src/poisson_solver.F90"
