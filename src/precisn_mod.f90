@@ -1,3 +1,9 @@
+! Distributed under MIT License
+!
+! Copyright (c) 2022 Tom Meltzer
+!
+! Please see LICENSE file for more information
+
 module precisn
     use, intrinsic :: iso_fortran_env
     implicit none

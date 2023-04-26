@@ -1,3 +1,9 @@
+! Distributed under MIT License
+!
+! Copyright (c) 2022 Tom Meltzer
+!
+! Please see LICENSE file for more information
+
 program poisson_solver
   ! Main program control for poisson solver. This code can be built to use either the Gauss-Seidel Method or LAPACK solvers
   ! Use macro USEGS=ON to select Gauss-Seidel and USEGS=OFF to select LAPACK
