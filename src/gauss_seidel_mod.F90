@@ -129,17 +129,21 @@ contains
       !$acc end parallel loop
 
       max_diff = 0._wp
+#ifdef USEGPU
       !$omp target teams if(is_GPU)
       !$omp distribute parallel do simd collapse(2) reduction(max:max_diff)
+#else
+      !$omp parallel do simd collapse(2) reduction(max:max_diff)
+#endif
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
           max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
-          write (*,'(A,I0,A,2(I4),3(F8.4))') 'thread = ', omp_get_thread_num(), ' i,j=', &
-            i, j, u_grid_old(i, j), u_grid(i, j), max_diff
         end do
       end do
+#ifdef USEGPU
       !$omp end target teams
+#endif
       !$acc end parallel loop
 
       if (max_diff < 1e-11) exit
