@@ -6,6 +6,8 @@
 
 module lapack
 
+#ifndef USEGS
+
   ! This module uses LAPACK routine dgesv to solve A(N, N) x(N) = b(N)
   use omp_lib
   use precisn, only: wp
@@ -122,5 +124,7 @@ contains
     u_grid(2:nr-1, 2:nc-1) = reshape(b, (/nr-2, nc-2/))
 
   end subroutine solve
+
+#endif
 
 end module lapack
