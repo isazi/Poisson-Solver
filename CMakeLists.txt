@@ -81,3 +81,4 @@ target_link_libraries(solver ${LAPACK_LIBRARIES})
 #add_library(precision STATIC "src/precisn_mod.f90")
 #target_link_libraries(main precision)
 
+install(TARGETS solver)
