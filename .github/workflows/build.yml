@@ -1,4 +1,4 @@
-name: build
+name: test-openmp-cpu-gnu
 
 on:
   push:
@@ -16,24 +16,37 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install deps
+      run: sudo apt install -y numdiff gfortran-12 gcc-12
+
     - name: Configure CMake Gauss-Seidel
       run: >
         cmake -B ${{github.workspace}}/build-gs
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        -D CMAKE_C_COMPILER=gcc
-        -D CMAKE_CXX_COMPILER=g++
+        -D CMAKE_C_COMPILER=gcc-12
+        -D CMAKE_Fortran_COMPILER=gfortran-12
         -D USEGS=ON
+        -D USEGPU=OFF
 
     - name: Configure CMake LAPACK
       run: >
         cmake -B ${{github.workspace}}/build-lp
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        -D CMAKE_C_COMPILER=gcc
-        -D CMAKE_CXX_COMPILER=g++
+        -D CMAKE_C_COMPILER=gcc-12
+        -D CMAKE_Fortran_COMPILER=gfortran-12
         -D USEGS=OFF
+        -D USEGPU=OFF
 
     - name: Compile Gauss-Seidel
       run: cmake --build ${{github.workspace}}/build-gs --config ${{env.BUILD_TYPE}}
 
     - name: Compile LAPACK
       run: cmake --build ${{github.workspace}}/build-lp --config ${{env.BUILD_TYPE}}
+
+    - name: Test Gauss-Seidel
+      working-directory: ${{github.workspace}}/build-gs
+      run: ctest -V
+
+    - name: Test LAPACK
+      working-directory: ${{github.workspace}}/build-lp
+      run: ctest -V

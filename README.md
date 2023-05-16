@@ -15,6 +15,11 @@ There is a build script `scripts/build.sh`.
 The binary `bin/solver` outputs the discrete grid `u_grid` to a fort file `fort.10`. You can check that both methods produce the
 same answer.
 
+## Hardware Requirements
+
+* I have only tested on NVIDIA GPUs
+* For NVIDIA GPUs and openMP offloading a GPU with Compute Capability >= 7.0 is required
+
 ## Results
 
 ### openMP (CPU only)
