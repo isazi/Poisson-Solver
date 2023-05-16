@@ -11,11 +11,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/mod")
 
+find_package(OpenMP REQUIRED)
+
 option(USEGS "Use Gauss-Seidel Method" ON)
 if (USEGS)
     add_definitions(-DUSEGS)
-    find_package(OpenMP REQUIRED)
-elseif()
+else()
+    find_package(BLAS REQUIRED)
     find_package(LAPACK REQUIRED)
 endif()
 
