@@ -125,7 +125,7 @@ contains
       !$acc end parallel loop
 
       max_diff = 0._wp
-      !$omp target teams distribute parallel do simd if(is_GPU) collapse(2) reduction(max:max_diff)
+      !$omp target teams distribute parallel do simd map(tofrom:max_diff) if(is_GPU) collapse(2) reduction(max:max_diff)
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
