@@ -17,14 +17,14 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install deps
-      run: sudo apt install -y numdiff gfortran-12 gcc-12
+      run: sudo apt install -y numdiff
 
     - name: Configure CMake Gauss-Seidel
       run: >
         cmake -B ${{github.workspace}}/build-gs
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        -D CMAKE_C_COMPILER=gcc-12
-        -D CMAKE_Fortran_COMPILER=gfortran-12
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_Fortran_COMPILER=gfortran
         -D USEGS=ON
         -D USEGPU=OFF
 
@@ -32,8 +32,8 @@ jobs:
       run: >
         cmake -B ${{github.workspace}}/build-lp
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        -D CMAKE_C_COMPILER=gcc-12
-        -D CMAKE_Fortran_COMPILER=gfortran-12
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_Fortran_COMPILER=gfortran
         -D USEGS=OFF
         -D USEGPU=OFF
 
