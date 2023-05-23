@@ -83,7 +83,7 @@ contains
     end if
 
     ! openMP 4.5 doesn't appear to support copying derived types
-    !$omp target data if(is_GPU) map(to:red_rows, red_cols, blu_rows, blu_cols) &
+    !$omp target data map(to:red_rows, red_cols, blu_rows, blu_cols) &
     !$omp             map(tofrom:u_grid) &
     !$omp             map(alloc:u_grid_old)
 
@@ -95,7 +95,11 @@ contains
 
     do n_iter = 1, max_iter
 
-      !$omp target teams distribute parallel do simd if(is_GPU) collapse(2)
+#ifdef USEGPU
+      !$omp target teams distribute parallel do simd collapse(2)
+#else
+      !$omp parallel do simd collapse(2)
+#endif
       !$acc parallel loop gang collapse(2)
       do j = 1, nc
         do i = 1, nr
@@ -104,7 +108,11 @@ contains
       end do
       !$acc end parallel loop
 
-      !$omp target teams distribute parallel do simd if(is_GPU) private(r, c, u_next)
+#ifdef USEGPU
+      !$omp target teams distribute parallel do simd private(r, c, u_next)
+#else
+      !$omp parallel do simd private(r, c, u_next)
+#endif
       !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red_rows(i)
@@ -114,7 +122,11 @@ contains
       end do
       !$acc end parallel loop
 
-      !$omp target teams distribute parallel do simd if(is_GPU) private(r, c, u_next)
+#ifdef USEGPU
+      !$omp target teams distribute parallel do simd private(r, c, u_next)
+#else
+      !$omp parallel do simd private(r, c, u_next)
+#endif
       !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu_rows(i)
@@ -125,7 +137,11 @@ contains
       !$acc end parallel loop
 
       max_diff = 0._wp
-      !$omp target teams distribute parallel do simd map(tofrom:max_diff) if(is_GPU) collapse(2) reduction(max:max_diff)
+#ifdef USEGPU
+      !$omp target teams distribute parallel do simd map(tofrom:max_diff) collapse(2) reduction(max:max_diff)
+#else
+      !$omp parallel do simd collapse(2) reduction(max:max_diff)
+#endif
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
