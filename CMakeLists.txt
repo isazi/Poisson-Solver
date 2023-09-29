@@ -68,12 +68,12 @@ elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
 endif()
 
 set(main_sources
-    "src/color_mod.f90"
+    "src/precisn_mod.f90"
     "src/config_mod.f90"
+    "src/color_mod.f90"
     "src/grid_mod.f90"
     "src/gauss_seidel_mod.F90"
     "src/lapack_mod.F90"
-    "src/precisn_mod.f90"
     "src/poisson_solver.F90"
 )
 
