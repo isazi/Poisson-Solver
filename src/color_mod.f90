@@ -5,23 +5,27 @@
 ! Please see LICENSE file for more information
 
 module color
-
+!$acc routine seq
+  
   use precisn, only: wp
   use config, only: nr, nc, debug
 
   implicit none
 
+  !$tuner initialize
   type color_group
     integer, allocatable :: rows(:)
     integer, allocatable :: cols(:)
     integer :: num
   end type color_group
+  !$tuner stop
 
   private
   public :: init_color_groups, color_group
 
 contains
 
+  !$tuner initialize
   function is_red(r, c) result(ans)
     ! Check if a given combination of row and column corresponds to a red or black element.
     ! inputs:
@@ -81,5 +85,6 @@ contains
     end if
 
   end subroutine init_color_groups
+  !$tuner stop
 
 end module color

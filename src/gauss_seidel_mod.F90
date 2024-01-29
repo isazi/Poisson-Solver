@@ -47,6 +47,7 @@ contains
     ! - max_diff : real(kind=wp)      : maximum difference in u_grid from previous iteration
     ! - n_iter   : int                : number of iterations performed
 
+    !$tuner initialize
     real(kind=wp), intent(out) :: u_grid(nr, nc)
     real(kind=wp), intent(out)   :: max_diff       ! max difference between matrix elements
     integer, intent(out)         :: n_iter         ! final number of iterations
@@ -57,6 +58,7 @@ contains
     integer           :: i, j
     integer, allocatable :: red_rows(:), red_cols(:)
     integer, allocatable :: blu_rows(:), blu_cols(:)
+    !$tuner stop
     logical :: is_GPU
 
     is_GPU = .false.
@@ -64,7 +66,7 @@ contains
     is_GPU = .true.
 #endif
 
-
+    !$tuner initialize
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
@@ -75,6 +77,7 @@ contains
     red_cols = red%cols
     blu_rows = blu%rows
     blu_cols = blu%cols
+    !$tuner stop
 
     if (is_GPU) then
       print *, 'Running on GPU...'
@@ -89,9 +92,11 @@ contains
 
     ! I have changed the openacc version to use the plain arrays instead of
     ! derived types to make the two version more similar
+    !$tuner initialize
     !$acc data copyin(red_rows, red_cols, blu_rows, blu_cols) &
     !$acc      copy(u_grid) &
     !$acc      create(u_grid_old)
+    !$tuner stop
 
     do n_iter = 1, max_iter
 
@@ -100,19 +105,22 @@ contains
 #else
       !$omp parallel do simd collapse(2)
 #endif
-      !$acc parallel loop gang collapse(2)
+      !$tuner start copy_old
+      !$acc parallel loop gang collapse(2) present(u_grid, u_grid_old)
       do j = 1, nc
         do i = 1, nr
           u_grid_old(i, j) = u_grid(i, j)
         end do
       end do
       !$acc end parallel loop
+      !$tuner stop
 
 #ifdef USEGPU
       !$omp target teams distribute parallel do simd private(r, c, u_next)
 #else
       !$omp parallel do simd private(r, c, u_next)
 #endif
+      !$tuner start update_red
       !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red_rows(i)
@@ -121,12 +129,14 @@ contains
         u_grid(r, c) = u_next
       end do
       !$acc end parallel loop
+      !$tuner stop
 
 #ifdef USEGPU
       !$omp target teams distribute parallel do simd private(r, c, u_next)
 #else
       !$omp parallel do simd private(r, c, u_next)
 #endif
+      !$tuner start update_blue
       !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu_rows(i)
@@ -135,6 +145,7 @@ contains
         u_grid(r, c) = u_next
       end do
       !$acc end parallel loop
+      !$tuner stop
 
       max_diff = 0._wp
 #ifdef USEGPU
@@ -142,6 +153,7 @@ contains
 #else
       !$omp parallel do simd collapse(2) reduction(max:max_diff)
 #endif
+      !$tuner start diff
       !$acc parallel loop collapse(2) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
@@ -149,6 +161,7 @@ contains
         end do
       end do
       !$acc end parallel loop
+      !$tuner stop
 
       if (max_diff < 1e-11) exit
 

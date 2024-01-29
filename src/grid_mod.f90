@@ -33,6 +33,7 @@ contains
 
   end subroutine get_xy_pos
 
+  !$tuner initialize
   subroutine init_grid(u_grid)
     ! u_grid (the solution) is initially unknown and we want to find it iteratively using the Gauss-seidel method or directly using
     ! LAPACK solvers
@@ -50,6 +51,7 @@ contains
     u_grid(:, nc) = alpha
 
   end subroutine init_grid
+  !$tuner stop
 
   function func(x, y) result(f)
     ! This function is the RHS of Laplacian D_xy U(x,y) = f(x,y)
