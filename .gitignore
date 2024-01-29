@@ -27,3 +27,6 @@ tags
 
 # binary files
 *.pdf
+
+# vscode
+.vscode/*
