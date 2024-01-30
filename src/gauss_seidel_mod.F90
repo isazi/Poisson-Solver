@@ -47,7 +47,6 @@ contains
     ! - max_diff : real(kind=wp)      : maximum difference in u_grid from previous iteration
     ! - n_iter   : int                : number of iterations performed
 
-    !$tuner initialize
     real(kind=wp), intent(out) :: u_grid(nr, nc)
     real(kind=wp), intent(out)   :: max_diff       ! max difference between matrix elements
     integer, intent(out)         :: n_iter         ! final number of iterations
@@ -58,7 +57,6 @@ contains
     integer           :: i, j
     integer, allocatable :: red_rows(:), red_cols(:)
     integer, allocatable :: blu_rows(:), blu_cols(:)
-    !$tuner stop
     logical :: is_GPU
 
     is_GPU = .false.
@@ -66,7 +64,6 @@ contains
     is_GPU = .true.
 #endif
 
-    !$tuner initialize
     call init_grid(u_grid)
     call init_color_groups(red, blu)
 
@@ -77,7 +74,6 @@ contains
     red_cols = red%cols
     blu_rows = blu%rows
     blu_cols = blu%cols
-    !$tuner stop
 
     if (is_GPU) then
       print *, 'Running on GPU...'
@@ -92,11 +88,9 @@ contains
 
     ! I have changed the openacc version to use the plain arrays instead of
     ! derived types to make the two version more similar
-    !$tuner initialize
     !$acc data copyin(red_rows, red_cols, blu_rows, blu_cols) &
     !$acc      copy(u_grid) &
     !$acc      create(u_grid_old)
-    !$tuner stop
 
     do n_iter = 1, max_iter
 
