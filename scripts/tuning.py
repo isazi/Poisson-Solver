@@ -9,7 +9,7 @@ with open("../src/gauss_seidel_mod.F90") as file:
     source = file.read()
 
 preprocessor = extract_preprocessor(source)
-preprocessor.join(["\n", f"#define n_rows {n_rows}", f"#define n_cols {n_cols}", f"#define grid_size {grid_size}"])
+preprocessor.append(f"\n#define n_rows {n_rows}\n#define n_cols {n_cols}\n#define grid_size {grid_size}")
 signatures = extract_directive_signature(source)
 functions = extract_directive_code(source)
 data = extract_directive_data(source)
