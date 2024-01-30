@@ -105,7 +105,7 @@ contains
 #else
       !$omp parallel do simd collapse(2)
 #endif
-      !$tuner start copy_old
+      !$tuner start copy_old u_grid(float*:grid_size) u_grid_old(float*:grid_size) nc(int:n_cols) nr(int:n_rows)
       !$acc parallel loop gang collapse(2) present(u_grid, u_grid_old)
       do j = 1, nc
         do i = 1, nr
