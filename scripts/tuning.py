@@ -16,7 +16,7 @@ data = extract_directive_data(source)
 for function in signatures.keys():
     print(f"Tuning {function}")
 
-    args = allocate_signature_memory(data[function], dimensions=sizes)
+    args = allocate_signature_memory(data[function], user_dimensions=sizes)
     code = generate_directive_function("", signatures[function], functions[function])
     
     tune_params = dict()
