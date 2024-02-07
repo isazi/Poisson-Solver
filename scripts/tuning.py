@@ -16,7 +16,7 @@ for function in signatures.keys():
     print(f"Tuning {function}")
 
     args = allocate_signature_memory(data[function], user_dimensions=sizes)
-    code = generate_directive_function("", signatures[function], functions[function], user_dimensions=sizes)
+    code = generate_directive_function("", signatures[function], functions[function], data=data[function], user_dimensions=sizes)
     
     tune_params = dict()
     tune_params["ngangs"] = [2**i for i in range(0, 15)]
