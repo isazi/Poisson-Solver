@@ -54,7 +54,9 @@ contains
     type(color_group) :: red, blu
     real(kind=wp)     :: u_grid_old(nr, nc), u_next
     integer           :: r, c
+    !$tuner initialize
     integer           :: i, j
+    !$tuner stop
     integer, allocatable :: red_rows(:), red_cols(:)
     integer, allocatable :: blu_rows(:), blu_cols(:)
     logical :: is_GPU
