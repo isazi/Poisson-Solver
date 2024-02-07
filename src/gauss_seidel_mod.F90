@@ -149,7 +149,7 @@ contains
       !$omp parallel do simd collapse(2) reduction(max:max_diff)
 #endif
       !$tuner start diff u_grid(float*:n_rows,n_cols) u_grid_old(float*:n_rows,n_cols) nc(int:n_cols) nr(int:n_rows)
-      !$acc parallel loop gang vector num_gangs(ngangs) vector_length(vlength) collapse(collapse_factor) reduction(max:max_diff)
+      !$acc parallel loop gang vector num_gangs(ngangs) vector_length(vlength) collapse(collapse_factor) reduction(max:max_diff) default(present)
       do j = 1, nc
         do i = 1, nr
           max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
