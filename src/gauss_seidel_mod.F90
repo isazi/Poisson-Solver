@@ -48,11 +48,14 @@ contains
     ! - n_iter   : int                : number of iterations performed
 
     real(kind=wp), intent(out) :: u_grid(nr, nc)
-    real(kind=wp), intent(out)   :: max_diff       ! max difference between matrix elements
+    !$tuner initialize
+    real              :: max_diff       ! max difference between matrix elements
+    !$tuner stop
     integer, intent(out)         :: n_iter         ! final number of iterations
 
     type(color_group) :: red, blu
-    real(kind=wp)     :: u_grid_old(nr, nc), u_next
+    real(kind=wp)     :: u_grid_old(nr, nc)
+    real              :: u_next
     integer           :: r, c
     !$tuner initialize
     integer           :: i, j
@@ -102,7 +105,7 @@ contains
       !$omp parallel do simd collapse(2)
 #endif
       !$tuner start copy_old u_grid(float*:n_rows,n_cols) u_grid_old(float*:n_rows,n_cols) nc(int:n_cols) nr(int:n_rows)
-      !$acc parallel loop gang collapse(2) default(present)
+      !$acc parallel loop num_gangs(ngangs) vector_length(vlength) collapse(collapse_factor) default(present)
       do j = 1, nc
         do i = 1, nr
           u_grid_old(i, j) = u_grid(i, j)
@@ -116,7 +119,6 @@ contains
 #else
       !$omp parallel do simd private(r, c, u_next)
 #endif
-      !$tuner start update_red
       !$acc parallel loop private(r, c, u_next)
       do i = 1, red%num
         r = red_rows(i)
@@ -125,14 +127,12 @@ contains
         u_grid(r, c) = u_next
       end do
       !$acc end parallel loop
-      !$tuner stop
 
 #ifdef USEGPU
       !$omp target teams distribute parallel do simd private(r, c, u_next)
 #else
       !$omp parallel do simd private(r, c, u_next)
 #endif
-      !$tuner start update_blue
       !$acc parallel loop private(r, c, u_next)
       do i = 1, blu%num
         r = blu_rows(i)
@@ -141,7 +141,6 @@ contains
         u_grid(r, c) = u_next
       end do
       !$acc end parallel loop
-      !$tuner stop
 
       max_diff = 0._wp
 #ifdef USEGPU
@@ -149,8 +148,8 @@ contains
 #else
       !$omp parallel do simd collapse(2) reduction(max:max_diff)
 #endif
-      !$tuner start diff
-      !$acc parallel loop collapse(2) reduction(max:max_diff)
+      !$tuner start diff u_grid(float*:n_rows,n_cols) u_grid_old(float*:n_rows,n_cols) nc(int:n_cols) nr(int:n_rows)
+      !$acc parallel loop num_gangs(ngangs) vector_length(vlength) collapse(collapse_factor) reduction(max:max_diff)
       do j = 1, nc
         do i = 1, nr
           max_diff = max(max_diff, abs(u_grid_old(i, j) - u_grid(i, j)))
