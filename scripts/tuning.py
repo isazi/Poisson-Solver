@@ -20,7 +20,6 @@ for function in signatures.keys():
     code = generate_directive_function("", signatures[function], functions[function], data=data[function], initialization=init, user_dimensions=sizes)
     
     tune_params = dict()
-    tune_params["ngangs"] = [2**i for i in range(0, 15)]
     tune_params["vlength"] = [2**i for i in range(0, 11)]
     tune_params["collapse_factor"] = [1, 2]
 
