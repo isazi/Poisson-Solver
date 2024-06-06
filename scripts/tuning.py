@@ -19,10 +19,10 @@ with open("../src/gauss_seidel_mod.F90") as file:
     source = file.read()
 
 app = Code(OpenACC(), Fortran())
-signatures = extract_directive_signature(source)
-functions = extract_directive_code(source)
-init = extract_initialization_code(source)
-data = extract_directive_data(source)
+signatures = extract_directive_signature(source, app)
+functions = extract_directive_code(source, app)
+init = extract_initialization_code(source, app)
+data = extract_directive_data(source, app)
 
 for function in signatures.keys():
     print(f"Tuning {function}")
@@ -32,6 +32,7 @@ for function in signatures.keys():
         "",
         signatures[function],
         functions[function],
+        app,
         data=data[function],
         initialization=init,
         user_dimensions=sizes,
