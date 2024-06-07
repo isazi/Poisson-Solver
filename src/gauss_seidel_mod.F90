@@ -93,9 +93,10 @@ contains
 
     ! I have changed the openacc version to use the plain arrays instead of
     ! derived types to make the two version more similar
-    !$acc data copyin(red_rows, red_cols, blu_rows, blu_cols) &
-    !$acc      copy(u_grid) &
-    !$acc      create(u_grid_old)
+    !$acc enter data copyin(red_rows, red_cols, blu_rows, blu_cols)
+    !$tuner initialize
+    !$acc enter data create(u_grid_old) copyin(u_grid)
+    !$tuner stop
 
     do n_iter = 1, max_iter
 
